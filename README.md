@@ -7,6 +7,8 @@ La aplicación no diagnostica el estado sanitario del producto, no sustituye la 
 física y no garantiza reducción de merma. Una prioridad alta significa que conviene revisar,
 no que el producto esté dañado: la inspección y la decisión final son siempre del comerciante.
 
+**Sitio publicado:** <https://pmv-fruterias.vercel.app>
+
 Está pensada para usarse en el teléfono del propio negocio, de pie y con una mano, durante un
 piloto de 7 días con 5 establecimientos de Huejutla de Reyes.
 
