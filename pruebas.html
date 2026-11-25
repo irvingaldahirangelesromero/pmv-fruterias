@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pruebas del PMV</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 1rem; }
+    table { border-collapse: collapse; }
+    th, td { border: 1px solid #444; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+    td { white-space: pre-wrap; }
+    .paso { background: #d7f5d7; }
+    .fallo { background: #f8d0d0; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <!-- Página de prueba. No forma parte del recorrido de la app ni se enlaza desde ella. -->
+  <h1>Pruebas del PMV</h1>
+  <p>Casos de docs/07-criterios.md que se pueden comprobar sin interfaz.
+     Ábrela desde un servidor local: <code>python3 -m http.server</code> y
+     <code>http://localhost:8000/pruebas.html</code>.</p>
+  <p id="resumen">Corriendo…</p>
+  <table>
+    <thead>
+      <tr><th>Caso</th><th>Esperado</th><th>Obtenido</th><th>Resultado</th></tr>
+    </thead>
+    <tbody id="filas"></tbody>
+  </table>
+
+  <script type="module">
+    import {
+      calcularPrioridad, avisoProductoGenerico, motivoCorto, POR_CONFIRMAR,
+    } from "./js/prioridad.js";
+
+    // Fecha fija para que las pruebas no dependan del día en que se corren.
+    const HOY = new Date(2026, 10, 25); // 25 de noviembre de 2026
+    const hace = (dias) => {
+      const fecha = new Date(HOY);
+      fecha.setDate(fecha.getDate() - dias);
+      return fecha.toLocaleDateString("sv-SE"); // formato AAAA-MM-DD en hora local
+    };
+    const lote = (producto, dias, recepcion, ambiente) => ({
+      producto,
+      fecha_ingreso: dias === null ? "" : hace(dias),
+      condicion_recepcion: recepcion,
+      condicion_ambiental: ambiente,
+    });
+    const resumen = (r) =>
+      `${r.puntaje === null ? "—" : r.puntaje.toFixed(1)} · ${r.nivel}`;
+
+    const resultados = [];
+    // Compara como texto para que la tabla muestre exactamente qué se esperaba y qué salió.
+    function probar(caso, esperado, obtener) {
+      let obtenido;
+      try {
+        obtenido = obtener();
+      } catch (error) {
+        obtenido = `Error: ${error.message}`;
+      }
+      const texto = (v) => (typeof v === "string" ? v : JSON.stringify(v));
+      resultados.push({ caso, esperado: texto(esperado), obtenido: texto(obtenido) });
+    }
+
+    function pruebasDePrioridad(config) {
+      const casos = [
+        ["RP-01 Jitomate", lote("Jitomate o tomate", 3, "Normal", "Calor o humedad elevada"), "46.4 · Alta"],
+        ["RP-02 Chile", lote("Chile", 2, "Con humedad o golpe", "Normal"), "30.0 · Media"],
+        ["RP-03 Cebolla", lote("Cebolla", 1, "Normal", "Normal"), "6.7 · Baja"],
+        ["RP-04 Plátano", lote("Plátano", 2, "Normal", "Calor o humedad elevada"), "41.7 · Alta"],
+        ["RP-05 Verdura de hoja", lote("Verdura de hoja", 1, "Óptima", "Normal"), "12.5 · Baja"],
+      ];
+      for (const [caso, datos, esperado] of casos) {
+        probar(caso, esperado, () => resumen(calcularPrioridad(datos, config, HOY)));
+      }
+
+      probar("RP-06 Otro usa la vida útil genérica", "7.1 · Baja · 7 días · genérica", () => {
+        const r = calcularPrioridad(lote("Otro", 1, "Óptima", "Normal"), config, HOY);
+        return `${resumen(r)} · ${r.vida_util_dias} días · ${r.vida_util_generica ? "genérica" : "configurada"}`;
+      });
+      probar("RP-06 el aviso declara los días de config.json",
+        "Producto sin vida útil de referencia configurada. Se usan 7 días como valor genérico.",
+        () => avisoProductoGenerico(config));
+      probar("RP-06 el aviso sigue a config.json si cambia la vida útil", true, () => {
+        const otra = structuredClone(config);
+        otra.productos.find((p) => p.generico).vida_util_dias = 9;
+        return avisoProductoGenerico(otra).includes("Se usan 9 días");
+      });
+
+      probar("ER-01 sin fecha: por confirmar, nunca Baja", `— · ${POR_CONFIRMAR}`,
+        () => resumen(calcularPrioridad(lote("Chile", null, "Normal", "Normal"), config, HOY)));
+      probar("ER-01 el resultado dice qué falta", ["fecha_ingreso"],
+        () => calcularPrioridad(lote("Chile", null, "Normal", "Normal"), config, HOY).faltantes);
+      probar("ER-02 fecha futura: por confirmar", `— · ${POR_CONFIRMAR}`,
+        () => resumen(calcularPrioridad(lote("Chile", -1, "Normal", "Normal"), config, HOY)));
+      probar("Fecha imposible (31 de febrero): por confirmar", `— · ${POR_CONFIRMAR}`,
+        () => resumen(calcularPrioridad({ ...lote("Chile", 1, "Normal", "Normal"), fecha_ingreso: "2026-02-31" }, config, HOY)));
+      probar("Condición faltante: por confirmar", `— · ${POR_CONFIRMAR}`,
+        () => resumen(calcularPrioridad(lote("Chile", 1, undefined, "Normal"), config, HOY)));
+
+      probar("Motivo corto de RP-01", "3 días desde el ingreso · recepción normal · calor o humedad elevada", () => {
+        const datos = lote("Jitomate o tomate", 3, "Normal", "Calor o humedad elevada");
+        return motivoCorto(datos, calcularPrioridad(datos, config, HOY));
+      });
+      probar("Motivo corto sin fecha", "Falta la fecha de ingreso", () => {
+        const datos = lote("Chile", null, "Normal", "Normal");
+        return motivoCorto(datos, calcularPrioridad(datos, config, HOY));
+      });
+    }
+
+    function mostrar() {
+      let fallidas = 0;
+      for (const { caso, esperado, obtenido } of resultados) {
+        const paso = esperado === obtenido;
+        if (!paso) fallidas++;
+        const fila = document.createElement("tr");
+        fila.className = paso ? "paso" : "fallo";
+        for (const texto of [caso, esperado, obtenido, paso ? "Pasó" : "Falló"]) {
+          const celda = document.createElement("td");
+          celda.textContent = texto;
+          fila.append(celda);
+        }
+        document.getElementById("filas").append(fila);
+      }
+      document.getElementById("resumen").textContent =
+        `${resultados.length - fallidas} de ${resultados.length} pruebas pasaron.`;
+    }
+
+    try {
+      const config = await (await fetch("./datos/config.json")).json();
+      pruebasDePrioridad(config);
+      mostrar();
+    } catch (error) {
+      document.getElementById("resumen").textContent = `No se pudieron correr las pruebas: ${error.message}`;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+{
+  "version_app": "0.1",
+  "fecha_publicacion": "",
+  "establecimiento": "SIN-ASIGNAR",
+
+  "regla": {
+    "peso_antiguedad": 50,
+    "ajuste_recepcion": {
+      "Óptima": 0,
+      "Normal": 5,
+      "Con humedad o golpe": 20
+    },
+    "ajuste_ambiental": {
+      "Normal": 0,
+      "Calor o humedad elevada": 20
+    },
+    "umbral_alta": 40,
+    "umbral_media": 20
+  },
+
+  "productos": [
+    { "nombre": "Jitomate o tomate", "vida_util_dias": 7 },
+    { "nombre": "Chile", "vida_util_dias": 10 },
+    { "nombre": "Plátano", "vida_util_dias": 6 },
+    { "nombre": "Mango", "vida_util_dias": 7 },
+    { "nombre": "Verdura de hoja", "vida_util_dias": 4 },
+    { "nombre": "Cebolla", "vida_util_dias": 30 },
+    { "nombre": "Papa", "vida_util_dias": 45 },
+    { "nombre": "Otro", "vida_util_dias": 7, "generico": true }
+  ],
+
+  "limite_observacion": 140,
+
+  "decisiones": [
+    "Priorizar salida",
+    "Mantener en venta",
+    "Separar",
+    "Descartar aviso"
+  ],
+
+  "textos": {
+    "aviso_prioridad": "Una prioridad alta significa que conviene revisar, no que el producto esté dañado.",
+    "aviso_decision": "La inspección física y la decisión final son suyas.",
+    "aviso_privacidad": "Los datos de este dispositivo no se envían a ningún servidor.",
+    "aviso_demo": "Datos de demostración. No corresponden a mercancía real.",
+    "aviso_producto_otro": "Producto sin vida útil de referencia configurada. Se usan {dias} días como valor genérico.",
+    "aviso_almacenamiento": "No se pudieron guardar los datos en este dispositivo. Continúe en su libreta y avísenos.",
+    "aviso_establecimiento": "Falta configurar el código de este establecimiento. El equipo lo asigna durante el alta; mientras tanto, los archivos exportados dirán {codigo}."
+  }
+}
