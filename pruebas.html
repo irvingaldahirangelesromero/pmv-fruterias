@@ -31,6 +31,9 @@
     import {
       calcularPrioridad, avisoProductoGenerico, motivoCorto, POR_CONFIRMAR,
     } from "./js/prioridad.js";
+    import {
+      estadoVacio, agregarLote, guardarDecision, prepararDemo, siguienteIdLote, fechaHoraLocal,
+    } from "./js/almacen.js";
 
     // Fecha fija para que las pruebas no dependan del día en que se corren.
     const HOY = new Date(2026, 10, 25); // 25 de noviembre de 2026
@@ -107,6 +110,38 @@
       });
     }
 
+    // No toca localStorage: comparte origen con la app y borraría datos reales.
+    function pruebasDeAlmacen(config, demo) {
+      // Con la fecha real de hoy: los lotes DEMO deben coincidir siempre con docs/04-reglas.md.
+      const hoyReal = new Date();
+      const estado = estadoVacio(config);
+      for (const datos of prepararDemo(demo, hoyReal)) agregarLote(estado, datos, config, hoyReal);
+
+      probar("Demo cargada hoy: puntajes de la tabla de verificación",
+        ["L-001 46.4 · Alta", "L-002 30.0 · Media", "L-003 6.7 · Baja", "L-004 41.7 · Alta", "L-005 12.5 · Baja"],
+        () => estado.lotes.map((l) => `${l.id_lote} ${resumen(calcularPrioridad(l, config, hoyReal))}`));
+      probar("Demo: los cinco lotes con origen DEMO", ["DEMO", "DEMO", "DEMO", "DEMO", "DEMO"],
+        () => estado.lotes.map((l) => l.origen));
+      probar("Evento lote_registrado con id_lote, origen, versión y establecimiento",
+        { evento: "lote_registrado", version_app: config.version_app, establecimiento: config.establecimiento, id_lote: "L-001", origen: "DEMO" },
+        () => { const { fecha_hora, ...resto } = estado.eventos[0]; return resto; });
+      probar("Fecha y hora local con desfase", true,
+        () => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/.test(estado.eventos[0].fecha_hora));
+
+      probar("Decisión: guarda fecha y hora igual a la del evento", true, () => {
+        const lote = estado.lotes[0];
+        guardarDecision(estado, lote, "Separar", "Revisar las de abajo", config, new Date());
+        const evento = estado.eventos.at(-1);
+        return evento.evento === "decision_guardada" && evento.decision === "Separar" &&
+          evento.id_lote === lote.id_lote && evento.fecha_hora === lote.fecha_decision;
+      });
+      probar("Id correlativo sigue al mayor", "L-008",
+        () => siguienteIdLote([{ id_lote: "L-001" }, { id_lote: "L-007" }]));
+      probar("Primer id", "L-001", () => siguienteIdLote([]));
+      probar("Formato de fecha y hora", "2026-03-05T09:07:03",
+        () => fechaHoraLocal(new Date(2026, 2, 5, 9, 7, 3)).slice(0, 19));
+    }
+
     function mostrar() {
       let fallidas = 0;
       for (const { caso, esperado, obtenido } of resultados) {
@@ -127,7 +162,9 @@
 
     try {
       const config = await (await fetch("./datos/config.json")).json();
+      const demo = await (await fetch("./datos/demo.json")).json();
       pruebasDePrioridad(config);
+      pruebasDeAlmacen(config, demo);
       mostrar();
     } catch (error) {
       document.getElementById("resumen").textContent = `No se pudieron correr las pruebas: ${error.message}`;

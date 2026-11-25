@@ -1,0 +1,50 @@
+{
+  "descripcion": "Cinco lotes ficticios de docs/04-reglas.md. La fecha de ingreso se calcula al cargarlos: hoy menos dias_desde_ingreso.",
+  "lotes": [
+    {
+      "origen": "DEMO",
+      "producto": "Jitomate o tomate",
+      "cantidad_kg": 25,
+      "dias_desde_ingreso": 3,
+      "condicion_recepcion": "Normal",
+      "condicion_ambiental": "Calor o humedad elevada",
+      "costo_aproximado": 450
+    },
+    {
+      "origen": "DEMO",
+      "producto": "Chile",
+      "cantidad_kg": 10,
+      "dias_desde_ingreso": 2,
+      "condicion_recepcion": "Con humedad o golpe",
+      "condicion_ambiental": "Normal",
+      "costo_aproximado": 300
+    },
+    {
+      "origen": "DEMO",
+      "producto": "Cebolla",
+      "cantidad_kg": 30,
+      "dias_desde_ingreso": 1,
+      "condicion_recepcion": "Normal",
+      "condicion_ambiental": "Normal",
+      "costo_aproximado": 360
+    },
+    {
+      "origen": "DEMO",
+      "producto": "Plátano",
+      "cantidad_kg": 18,
+      "dias_desde_ingreso": 2,
+      "condicion_recepcion": "Normal",
+      "condicion_ambiental": "Calor o humedad elevada",
+      "costo_aproximado": 220
+    },
+    {
+      "origen": "DEMO",
+      "producto": "Verdura de hoja",
+      "cantidad_kg": 5,
+      "dias_desde_ingreso": 1,
+      "condicion_recepcion": "Óptima",
+      "condicion_ambiental": "Normal",
+      "costo_aproximado": null
+    }
+  ]
+}
