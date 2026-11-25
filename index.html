@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#00473e">
+  <title>Prioridades de revisión</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <p id="aviso-carga" class="aviso-error" role="alert" hidden>
+    No se pudo abrir la aplicación. Revisa tu conexión y vuelve a abrirla.
+  </p>
+
+  <main id="app" hidden>
+
+    <!-- Vista 1. Prioridades de revisión (inicio) -->
+    <section id="vista-lista" class="vista" aria-labelledby="titulo-lista" hidden>
+      <h1 id="titulo-lista" tabindex="-1">Prioridades de revisión</h1>
+      <p class="aviso aviso-demo" id="lista-aviso-demo" data-texto="aviso_demo" hidden></p>
+
+      <ol id="lista-lotes" class="lista-lotes"></ol>
+
+      <div id="lista-vacia" class="vacio" hidden>
+        <p>Todavía no hay lotes registrados.</p>
+        <button type="button" class="boton secundario" data-accion="cargar-demo">Cargar datos de demostración</button>
+        <p class="mensaje" role="status" data-mensaje-demo></p>
+      </div>
+
+      <nav class="barra-inferior" aria-label="Acciones">
+        <a href="#historial" class="boton secundario">Historial</a>
+        <a href="#informacion" class="boton secundario">Información</a>
+        <a href="#registro" class="boton primario">Registrar lote</a>
+      </nav>
+    </section>
+
+    <!-- Vista 2. Registro de lote -->
+    <section id="vista-registro" class="vista" aria-labelledby="titulo-registro" hidden>
+      <div class="encabezado">
+        <a href="#lista" class="volver">← Volver</a>
+        <h1 id="titulo-registro" tabindex="-1">Registrar lote</h1>
+      </div>
+
+      <form id="form-lote" novalidate>
+        <div class="campo" data-campo="producto">
+          <label for="producto">Producto</label>
+          <select id="producto" name="producto" aria-describedby="error-producto nota-producto">
+            <option value="">Elige un producto</option>
+          </select>
+          <p class="nota" id="nota-producto" hidden></p>
+          <p class="error" id="error-producto" hidden></p>
+        </div>
+
+        <div class="campo" data-campo="cantidad">
+          <label for="cantidad">Cantidad (kg)</label>
+          <input id="cantidad" name="cantidad" type="number" inputmode="decimal" min="0" step="any"
+                 aria-describedby="error-cantidad">
+          <p class="error" id="error-cantidad" hidden></p>
+        </div>
+
+        <div class="campo" data-campo="fecha">
+          <label for="fecha">Fecha de ingreso</label>
+          <input id="fecha" name="fecha" type="date" aria-describedby="error-fecha">
+          <p class="error" id="error-fecha" hidden></p>
+        </div>
+
+        <fieldset class="campo" data-campo="recepcion" aria-describedby="error-recepcion">
+          <legend>Condición de recepción</legend>
+          <div class="opciones" id="opciones-recepcion"></div>
+          <p class="error" id="error-recepcion" hidden></p>
+        </fieldset>
+
+        <fieldset class="campo" data-campo="ambiental" aria-describedby="error-ambiental">
+          <legend>Condición ambiental</legend>
+          <div class="opciones" id="opciones-ambiental"></div>
+          <p class="error" id="error-ambiental" hidden></p>
+        </fieldset>
+
+        <div class="campo" data-campo="costo">
+          <label for="costo">Costo aproximado en pesos (opcional)</label>
+          <input id="costo" name="costo" type="number" inputmode="decimal" min="0" step="any"
+                 aria-describedby="error-costo">
+          <p class="error" id="error-costo" hidden></p>
+        </div>
+
+        <button type="submit" class="boton primario">Guardar lote</button>
+      </form>
+    </section>
+
+    <!-- Vista 3. Detalle y motivo -->
+    <section id="vista-detalle" class="vista" aria-labelledby="detalle-producto" hidden>
+      <div class="encabezado">
+        <a href="#lista" class="volver">← Volver</a>
+        <h1 id="detalle-producto" tabindex="-1"></h1>
+      </div>
+      <p id="detalle-datos" class="datos-lote"></p>
+      <p id="detalle-nivel" class="nivel nivel-grande"></p>
+
+      <p class="aviso" data-texto="aviso_prioridad"></p>
+      <p class="aviso" data-texto="aviso_decision"></p>
+
+      <p id="detalle-generico" class="nota" hidden></p>
+
+      <table id="detalle-desglose" class="desglose" hidden>
+        <caption>Por qué tiene esta prioridad</caption>
+        <tbody></tbody>
+      </table>
+
+      <p id="detalle-decision-actual" class="decision-actual" hidden></p>
+      <div id="detalle-acciones" class="barra-inferior" hidden>
+        <a id="detalle-boton-decision" class="boton primario">Registrar decisión</a>
+      </div>
+    </section>
+
+    <!-- Vista 4. Decisión -->
+    <section id="vista-decision" class="vista" aria-labelledby="titulo-decision" hidden>
+      <div class="encabezado">
+        <a id="decision-volver" class="volver">← Volver</a>
+        <h1 id="titulo-decision" tabindex="-1">Registrar decisión</h1>
+      </div>
+      <p id="decision-lote" class="datos-lote"></p>
+
+      <form id="form-decision" novalidate>
+        <fieldset class="campo" data-campo="decision" aria-describedby="error-decision">
+          <legend>¿Qué decides para este lote?</legend>
+          <div class="opciones" id="opciones-decision"></div>
+          <p class="error" id="error-decision" hidden></p>
+        </fieldset>
+
+        <div class="campo">
+          <label for="observacion">Observación (opcional)</label>
+          <textarea id="observacion" name="observacion" rows="3" aria-describedby="contador-observacion"></textarea>
+          <p class="contador" id="contador-observacion"></p>
+        </div>
+
+        <button type="submit" class="boton primario">Guardar decisión</button>
+      </form>
+    </section>
+
+    <!-- Vista 5. Historial -->
+    <section id="vista-historial" class="vista" aria-labelledby="titulo-historial" hidden>
+      <div class="encabezado">
+        <a href="#lista" class="volver">← Volver</a>
+        <h1 id="titulo-historial" tabindex="-1">Historial</h1>
+      </div>
+      <p class="aviso" data-texto="aviso_privacidad"></p>
+
+      <ol id="lista-historial" class="lista-historial"></ol>
+      <p id="historial-vacio" class="vacio" hidden>Todavía no hay registros.</p>
+    </section>
+
+    <!-- Pantalla de información -->
+    <section id="vista-informacion" class="vista" aria-labelledby="titulo-informacion" hidden>
+      <div class="encabezado">
+        <a href="#lista" class="volver">← Volver</a>
+        <h1 id="titulo-informacion" tabindex="-1">Información</h1>
+      </div>
+
+      <dl class="ficha">
+        <dt>Versión</dt><dd id="info-version"></dd>
+        <dt>Fecha de publicación</dt><dd id="info-fecha"></dd>
+        <dt>Establecimiento</dt><dd id="info-establecimiento"></dd>
+      </dl>
+      <p id="info-aviso-establecimiento" class="aviso-error" hidden></p>
+
+      <h2>Qué hace esta herramienta</h2>
+      <p>Indica qué lote conviene revisar primero, con una regla aritmética que se muestra en
+         pantalla.</p>
+      <ul>
+        <li>No diagnostica la inocuidad ni el estado sanitario del producto.</li>
+        <li>No sustituye la inspección física.</li>
+        <li>No garantiza reducción de merma ni ahorro.</li>
+      </ul>
+      <p class="aviso" data-texto="aviso_prioridad"></p>
+      <p class="aviso" data-texto="aviso_decision"></p>
+
+      <h2>Lo que hace el equipo a mano</h2>
+      <p>Parte del servicio no lo hace la aplicación, sino el equipo del proyecto (servicio concierge):</p>
+      <ol>
+        <li>Alta del establecimiento y configuración de la vida útil de sus productos habituales.</li>
+        <li>Acompañamiento en el primer registro.</li>
+        <li>Consolidación de las exportaciones que entrega el comerciante.</li>
+      </ol>
+
+      <h2>Datos de demostración</h2>
+      <p class="aviso aviso-demo" data-texto="aviso_demo"></p>
+      <button type="button" class="boton secundario" data-accion="cargar-demo">Cargar datos de demostración</button>
+      <p class="mensaje" role="status" data-mensaje-demo></p>
+
+      <h2>Datos de este dispositivo</h2>
+      <p class="aviso" data-texto="aviso_privacidad"></p>
+      <button type="button" class="boton peligro" id="boton-borrar">Borrar todos los datos de este dispositivo</button>
+      <div id="confirmar-borrar" class="confirmar" hidden>
+        <p><strong>¿Borrar todo?</strong> Se borran todos los lotes, decisiones y registros de este
+           teléfono y no se pueden recuperar. Si los necesitas, exporta el historial antes.</p>
+        <button type="button" class="boton peligro" id="boton-borrar-si">Sí, borrar todo</button>
+        <button type="button" class="boton secundario" id="boton-borrar-no">Cancelar</button>
+      </div>
+      <p class="mensaje" role="status" id="mensaje-borrar"></p>
+    </section>
+
+  </main>
+</body>
+</html>

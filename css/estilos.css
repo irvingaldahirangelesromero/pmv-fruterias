@@ -1,0 +1,364 @@
+/* Estilos del PMV. Pensado para un teléfono de 360 px, de pie y con una mano:
+   letra grande, contraste alto y botones de al menos 48 px de alto. */
+
+:root {
+  --texto: #111111;
+  --texto-suave: #333333;
+  --fondo: #ffffff;
+  --fondo-suave: #f1f1f1;
+  --borde: #333333;
+  --primario: #00473e;
+  --error: #a50016;
+  --enfoque: #1a56db;
+
+  /* Colores de nivel. El color nunca va solo: siempre acompaña al texto del nivel. */
+  --alta: #8b0000;
+  --media: #f2a900;
+  --baja: #1b5e20;
+  --confirmar: #4d4d4d;
+}
+
+* { box-sizing: border-box; }
+
+/* Sin esto, una clase con display ganaría al atributo hidden. */
+[hidden] { display: none !important; }
+
+html { font-size: 18px; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--texto);
+  background: var(--fondo);
+  line-height: 1.4;
+}
+
+main {
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+h1 { font-size: 1.4rem; margin: 0.6rem 0; }
+h1:focus { outline: none; }
+h2 { font-size: 1.15rem; margin: 1.5rem 0 0.5rem; }
+
+a { color: var(--primario); }
+
+:focus-visible {
+  outline: 3px solid var(--enfoque);
+  outline-offset: 2px;
+}
+
+.encabezado {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.volver {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 0.5rem 0 0;
+  color: var(--texto);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---------- Botones ---------- */
+
+.boton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 56px;
+  margin: 0.75rem 0;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--borde);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primario { background: var(--primario); border-color: var(--primario); color: #ffffff; }
+.secundario { background: var(--fondo); color: var(--texto); }
+.peligro { background: var(--error); border-color: var(--error); color: #ffffff; }
+
+/* La acción principal queda abajo, al alcance del pulgar. */
+.barra-inferior {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 0.5rem;
+  margin-top: 1rem;
+  padding: 0.25rem 0;
+  background: var(--fondo);
+  border-top: 2px solid #cccccc;
+}
+.barra-inferior .boton { margin: 0.4rem 0; }
+.barra-inferior .primario { grid-column: 1 / -1; }
+
+/* ---------- Avisos ---------- */
+
+.aviso {
+  margin: 0.6rem 0;
+  padding: 0.6rem 0.75rem;
+  border-left: 6px solid var(--primario);
+  background: var(--fondo-suave);
+  font-weight: 600;
+}
+
+.aviso-demo { border-left-color: #000000; border-left-style: double; }
+
+.aviso-error {
+  margin: 0.6rem 0;
+  padding: 0.75rem 1rem;
+  border: 3px solid var(--error);
+  background: #fde8e8;
+  color: #5a0000;
+  font-weight: 700;
+}
+
+/* El aviso de almacenamiento (ER-04) queda fijo arriba en todas las vistas. */
+.aviso-fijo {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: 0;
+}
+
+.nota {
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid #8a6100;
+  border-radius: 8px;
+  background: #fff4d6;
+}
+
+.mensaje:empty { display: none; }
+.mensaje { font-weight: 700; }
+
+.vacio { margin: 1rem 0; }
+
+/* ---------- Niveles ---------- */
+
+.nivel {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.nivel-alta { background: var(--alta); color: #ffffff; }
+.nivel-media { background: var(--media); color: #111111; }
+.nivel-baja { background: var(--baja); color: #ffffff; }
+.nivel-confirmar { background: var(--confirmar); color: #ffffff; }
+
+.nivel-grande {
+  display: block;
+  margin: 0.5rem 0;
+  padding: 0.5rem 1rem;
+  font-size: 1.6rem;
+  text-align: center;
+  white-space: normal;
+}
+
+.etiqueta-demo {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0 0.4rem;
+  border: 2px dashed #000000;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* ---------- Lista de lotes ---------- */
+
+.lista-lotes {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0.75rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fila-lote {
+  display: block;
+  min-height: 48px;
+  padding: 0.7rem 0.8rem;
+  border: 2px solid var(--borde);
+  border-radius: 10px;
+  color: var(--texto);
+  text-decoration: none;
+  transition: background-color 2s ease-out;
+}
+
+.fila-cabeza {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.fila-producto { font-weight: 700; }
+.fila-motivo { display: block; margin-top: 0.3rem; color: var(--texto-suave); font-size: 0.95rem; }
+
+/* Lote recién guardado: se resalta un instante y luego se desvanece. */
+.resaltado { background-color: #fff1a8; transition: none; }
+
+/* ---------- Formularios ---------- */
+
+form { padding-bottom: 1rem; }
+
+.campo { margin: 1.1rem 0; }
+
+fieldset { border: 0; padding: 0; min-width: 0; }
+
+label,
+legend {
+  display: block;
+  margin-bottom: 0.35rem;
+  padding: 0;
+  font-weight: 700;
+}
+
+input,
+select,
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--borde);
+  border-radius: 8px;
+  background: var(--fondo);
+  color: var(--texto);
+  font: inherit;
+  font-size: 1.1rem;
+}
+
+textarea { min-height: 5.5rem; resize: vertical; }
+
+/* Opciones de una sola elección como botones grandes (radios accesibles). */
+.opciones { display: grid; gap: 0.5rem; }
+
+.opcion { position: relative; display: block; margin: 0; }
+
+.opcion input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+}
+
+.opcion span {
+  display: flex;
+  align-items: center;
+  min-height: 56px;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--borde);
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.opcion span::before {
+  content: "";
+  flex: none;
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-right: 0.7rem;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+/* Elegida: cambia el color y aparece una marca, para no depender solo del color. */
+.opcion input:checked + span { background: var(--primario); border-color: var(--primario); color: #ffffff; }
+.opcion input:checked + span::before {
+  content: "✓";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: var(--primario);
+  font-size: 0.95rem;
+}
+.opcion input:focus-visible + span { outline: 3px solid var(--enfoque); outline-offset: 2px; }
+
+/* Error: borde más grueso y texto junto al campo, nunca solo color. */
+.con-error input,
+.con-error select,
+.con-error textarea,
+.con-error .opcion span { border-color: var(--error); border-width: 3px; }
+
+.error {
+  margin: 0.4rem 0 0;
+  color: var(--error);
+  font-weight: 700;
+}
+.error::before { content: "⚠ "; }
+
+.contador { margin: 0.25rem 0 0; color: var(--texto-suave); font-size: 0.9rem; }
+
+/* ---------- Detalle ---------- */
+
+.datos-lote { margin: 0.25rem 0; color: var(--texto-suave); }
+
+.desglose {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+}
+.desglose caption { margin-bottom: 0.4rem; font-weight: 700; text-align: left; }
+.desglose th,
+.desglose td {
+  padding: 0.45rem 0.25rem;
+  border-bottom: 1px solid #bbbbbb;
+  text-align: left;
+  vertical-align: top;
+}
+.desglose .numero {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.desglose .total th,
+.desglose .total td { border-top: 3px solid var(--texto); border-bottom: 0; font-size: 1.1rem; }
+
+.decision-actual { font-weight: 700; }
+
+/* ---------- Historial ---------- */
+
+.lista-historial { margin: 0.75rem 0; padding: 0; list-style: none; }
+
+.lista-historial li {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #bbbbbb;
+}
+
+.historial-fecha { display: block; color: var(--texto-suave); font-size: 0.9rem; }
+.historial-observacion { display: block; margin-top: 0.2rem; font-style: italic; }
+
+/* ---------- Información ---------- */
+
+.ficha { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 0.75rem; margin: 0.75rem 0; }
+.ficha dt { font-weight: 700; }
+.ficha dd { margin: 0; overflow-wrap: anywhere; }
+
+.confirmar {
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  border: 3px solid var(--error);
+  border-radius: 10px;
+}
