@@ -1,21 +1,47 @@
-/* Estilos del PMV. Pensado para un teléfono de 360 px, de pie y con una mano:
-   letra grande, contraste alto y botones de al menos 48 px de alto. */
+/* Estilos del PMV. Se usa en el mostrador, de pie, con una mano y muchas veces a pleno sol,
+   en un teléfono de 360 px. La idea visual es la libreta del comerciante: papel claro,
+   renglones, tinta y la cuenta del puntaje escrita como una suma.
+   Todo el texto supera 7.9:1 de contraste y todo lo que se toca mide al menos 48 px. */
 
 :root {
-  --texto: #111111;
-  --texto-suave: #333333;
-  --fondo: #ffffff;
-  --fondo-suave: #f1f1f1;
-  --borde: #333333;
-  --primario: #00473e;
-  --error: #a50016;
-  --enfoque: #1a56db;
+  /* Papel y tinta */
+  --papel: #f5efe3;
+  --hoja: #fffcf5;
+  --tinta: #1f1b16;
+  --tinta-suave: #4d463c; /* 8.1:1 sobre papel */
+  --renglon: #cfc3ae; /* solo líneas, nunca texto */
+  --borde: #6b6257; /* contorno de campos: 5.8:1 */
+  --pista: #e9e0cf; /* fondo de las barras del desglose */
+  --error: #7a2418;
+  --error-fondo: #f7e4df;
+  --nota-fondo: #fbefd3;
+  --nota-borde: #8a6100;
+  --resaltado: #f8e1ad;
 
-  /* Colores de nivel. El color nunca va solo: siempre acompaña al texto del nivel. */
-  --alta: #8b0000;
-  --media: #f2a900;
-  --baja: #1b5e20;
-  --confirmar: #4d4d4d;
+  /* Colores de nivel. Siempre de fondo, con letra blanca o tinta, y nunca solos:
+     van con el texto del nivel y con la marca de tres cuadros. */
+  --alta: #8a2a1d; /* blanco encima: 8.6:1 */
+  --media: #e8ae3a; /* tinta encima: 8.6:1 */
+  --baja: #2e5638; /* blanco encima: 8.4:1 */
+  --confirmar: #55504a; /* blanco encima: 8.0:1 */
+
+  /* Escala tipográfica: nada por debajo de 16 px y el cuerpo en 17 px. */
+  --t-meta: 1rem;
+  --t-cuerpo: 1.0625rem;
+  --t-boton: 1.25rem;
+  --t-titulo: 1.5rem;
+  --t-nivel: 2.125rem;
+  --t-puntaje: 3rem;
+
+  --radio: 12px;
+  --curva: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Íconos dibujados en SVG dentro de la hoja de estilos: no son peticiones de red. */
+  --i-izquierda: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M11 5l-7 7 7 7'/%3E%3C/svg%3E");
+  --i-derecha: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 5l7 7-7 7'/%3E%3C/svg%3E");
+  --i-mas: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M12 4v16M4 12h16'/%3E%3C/svg%3E");
+  --i-palomita: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12.5l5 5L20 6.5'/%3E%3C/svg%3E");
+  --i-alerta: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5 1.5 21h21z' fill='%23000'/%3E%3Cpath d='M12 9.5v5' stroke='%23fff' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='17.6' r='1.4' fill='%23fff'/%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; }
@@ -23,15 +49,25 @@
 /* Sin esto, una clase con display ganaría al atributo hidden. */
 [hidden] { display: none !important; }
 
-html { font-size: 18px; }
+html {
+  background: var(--papel);
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+}
 
 body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color: var(--texto);
-  background: var(--fondo);
-  line-height: 1.4;
+  font-size: var(--t-cuerpo);
+  line-height: 1.45;
+  color: var(--tinta);
+  background: var(--papel);
+  caret-color: var(--tinta);
+  accent-color: var(--tinta);
+  -webkit-tap-highlight-color: transparent;
 }
+
+::selection { background: var(--resaltado); color: var(--tinta); }
 
 main {
   max-width: 32rem;
@@ -39,32 +75,64 @@ main {
   padding: 0 1rem;
 }
 
-h1 { font-size: 1.4rem; margin: 0.6rem 0; }
+h1 {
+  margin: 0.75rem 0 1rem;
+  font-size: var(--t-titulo);
+  line-height: 1.2;
+  text-wrap: balance;
+}
 h1:focus { outline: none; }
-h2 { font-size: 1.15rem; margin: 1.5rem 0 0.5rem; }
 
-a { color: var(--primario); }
+h2 {
+  margin: 1.25rem 0 0.5rem;
+  font-size: var(--t-boton);
+  line-height: 1.25;
+}
+
+p { margin: 0.6rem 0; }
+
+a { color: var(--tinta); text-underline-offset: 0.2em; text-decoration-thickness: 2px; }
 
 :focus-visible {
-  outline: 3px solid var(--enfoque);
-  outline-offset: 2px;
+  outline: 3px solid var(--tinta);
+  outline-offset: 3px;
 }
 
-.encabezado {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+/* Cifras de ancho fijo en todo lo que es número: puntajes, kilos, fechas y horas. */
+.num { font-variant-numeric: tabular-nums; }
+.sin-cortes { white-space: nowrap; }
+
+/* ---------- Íconos ---------- */
+
+.icono {
+  display: inline-block;
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+  background: currentColor;
+  -webkit-mask: var(--icono) center / contain no-repeat;
+  mask: var(--icono) center / contain no-repeat;
 }
+.icono-volver { --icono: var(--i-izquierda); }
+.icono-seguir { --icono: var(--i-derecha); }
+.icono-mas { --icono: var(--i-mas); }
+.icono-palomita { --icono: var(--i-palomita); }
+
+/* ---------- Encabezado de las vistas interiores ---------- */
 
 .volver {
   display: inline-flex;
   align-items: center;
+  gap: 0.4rem;
   min-height: 48px;
-  padding: 0 0.5rem 0 0;
-  color: var(--texto);
+  margin-top: 0.25rem;
+  padding-right: 1rem;
   font-weight: 700;
-  white-space: nowrap;
+  text-decoration: none;
 }
+.volver:active { opacity: 0.7; }
+
+.encabezado h1 { margin-top: 0.1rem; }
 
 /* ---------- Botones ---------- */
 
@@ -72,57 +140,88 @@ a { color: var(--primario); }
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   width: 100%;
   min-height: 56px;
   margin: 0.75rem 0;
   padding: 0.5rem 1rem;
-  border: 2px solid var(--borde);
-  border-radius: 10px;
+  border: 2px solid var(--tinta);
+  border-radius: var(--radio);
   font: inherit;
-  font-size: 1.1rem;
+  font-size: var(--t-boton);
   font-weight: 700;
+  line-height: 1.2;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
+  transition: background-color 120ms ease-out;
 }
 
-.primario { background: var(--primario); border-color: var(--primario); color: #ffffff; }
-.secundario { background: var(--fondo); color: var(--texto); }
-.peligro { background: var(--error); border-color: var(--error); color: #ffffff; }
+/* La acción principal va en tinta: un botón de color se confundiría con un nivel. */
+.primario { background: var(--tinta); color: var(--papel); }
+.primario:active { background: #000000; }
+.secundario { background: var(--hoja); color: var(--tinta); }
+.secundario:active { background: var(--pista); }
+.peligro { background: var(--alta); border-color: var(--alta); color: #ffffff; }
+.peligro:active { background: #6e2015; }
 
-/* La acción principal queda abajo, al alcance del pulgar. */
+/* Las vistas con acciones ocupan al menos toda la pantalla: así la barra queda abajo, en la
+   zona del pulgar, aunque haya poco contenido (lista vacía, historial corto). */
+.vista:has(.barra-inferior),
+.vista:has(.barra-inferior) > form {
+  display: flex;
+  flex-direction: column;
+}
+.vista:has(.barra-inferior) { min-height: 100dvh; }
+.vista:has(.barra-inferior) > form { flex: 1; }
+
+/* En una columna flex los márgenes no se colapsan, se suman. Ahí solo cuenta el margen de
+   abajo de cada bloque; si no, los huecos se duplican y se come la primera pantalla. */
+.vista:has(.barra-inferior) > * + :not(.barra-inferior),
+.vista:has(.barra-inferior) > form > :not(.barra-inferior),
+.vista:has(.barra-inferior) section > h2:first-child,
+.historial-dia:first-child { margin-top: 0; }
+#lista-primero { margin-bottom: 1.25rem; }
+
+/* Las acciones quedan abajo, al alcance del pulgar, mientras la vista esté en pantalla. */
 .barra-inferior {
   position: sticky;
   bottom: 0;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0 0.5rem;
-  margin-top: 1rem;
-  padding: 0.25rem 0;
-  background: var(--fondo);
-  border-top: 2px solid #cccccc;
+  gap: 0.5rem;
+  margin: auto -1rem 0;
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+  background: var(--papel);
+  border-top: 2px solid var(--renglon);
 }
-.barra-inferior .boton { margin: 0.4rem 0; }
-.barra-inferior .primario { grid-column: 1 / -1; }
+.barra-inferior > * { grid-column: 1 / -1; }
+.barra-inferior .boton { margin: 0; }
+.barra-inferior .boton.secundario { grid-column: auto; min-height: 48px; font-size: var(--t-cuerpo); }
+.barra-inferior .aviso-anclado { margin: 0 0 0.1rem; font-weight: 600; }
 
 /* ---------- Avisos ---------- */
 
 .aviso {
-  margin: 0.6rem 0;
-  padding: 0.6rem 0.75rem;
-  border-left: 6px solid var(--primario);
-  background: var(--fondo-suave);
+  margin: 0.75rem 0;
+  padding: 0.75rem 0.9rem;
+  border: 2px solid var(--renglon);
+  border-radius: var(--radio);
+  background: var(--hoja);
   font-weight: 600;
 }
 
-.aviso-demo { border-left-color: #000000; border-left-style: double; }
+/* Datos de demostración: borde punteado, como la etiqueta DEMO. */
+.aviso-demo { padding: 0.5rem 0.9rem; border: 2px dashed var(--tinta); background: transparent; }
 
 .aviso-error {
-  margin: 0.6rem 0;
+  margin: 0.75rem 0;
   padding: 0.75rem 1rem;
   border: 3px solid var(--error);
-  background: #fde8e8;
-  color: #5a0000;
+  border-radius: var(--radio);
+  background: var(--error-fondo);
+  color: #4f150c;
   font-weight: 700;
 }
 
@@ -130,103 +229,160 @@ a { color: var(--primario); }
 .aviso-fijo {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 3;
   margin: 0;
+  border-width: 0 0 3px;
+  border-radius: 0;
 }
 
 .nota {
-  margin: 0.5rem 0;
-  padding: 0.5rem 0.75rem;
-  border: 2px solid #8a6100;
-  border-radius: 8px;
-  background: #fff4d6;
+  margin: 0.6rem 0;
+  padding: 0.6rem 0.8rem;
+  border: 2px solid var(--nota-borde);
+  border-radius: 10px;
+  background: var(--nota-fondo);
 }
 
 .mensaje:empty { display: none; }
 .mensaje { font-weight: 700; }
 
-.vacio { margin: 1rem 0; }
+.etiqueta-demo {
+  display: inline-block;
+  margin-left: 0.15rem;
+  padding: 0 0.35rem;
+  border: 2px dashed currentColor;
+  border-radius: 4px;
+  font-size: var(--t-meta);
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  vertical-align: 0.05em;
+}
 
 /* ---------- Niveles ---------- */
 
 .nivel {
-  display: inline-block;
-  padding: 0.15rem 0.6rem;
-  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 .nivel-alta { background: var(--alta); color: #ffffff; }
-.nivel-media { background: var(--media); color: #111111; }
+.nivel-media { background: var(--media); color: var(--tinta); }
 .nivel-baja { background: var(--baja); color: #ffffff; }
 .nivel-confirmar { background: var(--confirmar); color: #ffffff; }
 
-.nivel-grande {
+/* Marca de tres cuadros: Alta ■■■, Media ■■□, Baja ■□□, por confirmar □□□ punteado.
+   Es la señal que distingue los niveles sin color (en gris, Alta, Baja y por confirmar
+   tienen casi la misma luminosidad). */
+.marca { display: inline-flex; gap: 0.18em; }
+.marca i {
+  width: 0.62em;
+  height: 0.62em;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+}
+.nivel-alta .marca i,
+.nivel-media .marca i:nth-child(-n + 2),
+.nivel-baja .marca i:first-child { background: currentColor; }
+.nivel-confirmar .marca i { border-style: dashed; }
+
+/* ---------- Vista 1. Prioridades de revisión ---------- */
+
+/* El lote que conviene revisar primero: una tarjeta de acción, no un renglón más. */
+.tarjeta {
   display: block;
-  margin: 0.5rem 0;
-  padding: 0.5rem 1rem;
-  font-size: 1.6rem;
-  text-align: center;
+  overflow: hidden;
+  border: 2px solid var(--tinta);
+  border-radius: var(--radio);
+  background: var(--hoja);
+  color: var(--tinta);
+  text-decoration: none;
+  transition: background-color 1.2s ease-out;
+}
+.tarjeta:active { background: var(--pista); }
+
+.franja {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0;
+  font-size: var(--t-boton);
   white-space: normal;
 }
+.franja .marca { font-size: var(--t-cuerpo); }
+.franja-nivel { display: inline-flex; align-items: center; gap: 0.55rem; }
+.franja-puntaje { font-size: var(--t-puntaje); line-height: 1; }
+.franja { padding-block: 0.35rem; }
 
-.etiqueta-demo {
-  display: inline-block;
-  margin-left: 0.35rem;
-  padding: 0 0.4rem;
-  border: 2px dashed #000000;
-  border-radius: 4px;
-  font-size: 0.85rem;
+.tarjeta-cuerpo { display: block; padding: 0.75rem 1rem 0.5rem; }
+.tarjeta-producto { display: block; font-size: var(--t-titulo); font-weight: 700; line-height: 1.2; }
+.tarjeta-motivo { display: block; margin-top: 0.3rem; color: var(--tinta-suave); }
+.tarjeta-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.tarjeta-cantidad { font-weight: 600; }
+.tarjeta-accion {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 48px;
   font-weight: 700;
-  vertical-align: middle;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
 }
 
-/* ---------- Lista de lotes ---------- */
-
-.lista-lotes {
-  display: grid;
-  gap: 0.6rem;
-  margin: 0.75rem 0;
+/* Los demás lotes, como renglones de libreta. */
+.renglones {
+  margin: 0;
   padding: 0;
   list-style: none;
+  border-top: 2px solid var(--renglon);
 }
 
-.fila-lote {
-  display: block;
-  min-height: 48px;
-  padding: 0.7rem 0.8rem;
-  border: 2px solid var(--borde);
-  border-radius: 10px;
-  color: var(--texto);
+.renglon {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 0.3rem 0.75rem;
+  min-height: 64px;
+  padding: 0.7rem 0.25rem;
+  border-bottom: 2px solid var(--renglon);
+  color: var(--tinta);
   text-decoration: none;
-  transition: background-color 2s ease-out;
+  transition: background-color 1.2s ease-out;
 }
+.renglon:active { background: var(--pista); }
+.renglon-producto { font-weight: 700; }
+.renglon-motivo { grid-column: 1 / -1; color: var(--tinta-suave); }
 
-.fila-cabeza {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 0.5rem;
-}
+/* Lote recién guardado: se tiñe un instante y se desvanece solo. */
+.resaltado,
+.resaltado .tarjeta-cuerpo { background-color: var(--resaltado); transition: none; }
 
-.fila-producto { font-weight: 700; }
-.fila-motivo { display: block; margin-top: 0.3rem; color: var(--texto-suave); font-size: 0.95rem; }
-
-/* Lote recién guardado: se resalta un instante y luego se desvanece. */
-.resaltado { background-color: #fff1a8; transition: none; }
+.vacio { margin: 0.5rem 0 1rem; }
+.vacio h2 { margin-top: 0; }
 
 /* ---------- Formularios ---------- */
 
-form { padding-bottom: 1rem; }
+.campo { margin: 1.25rem 0; }
 
-.campo { margin: 1.1rem 0; }
-
-fieldset { border: 0; padding: 0; min-width: 0; }
+fieldset { margin: 0; border: 0; padding: 0; min-width: 0; }
 
 label,
 legend {
   display: block;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.4rem;
   padding: 0;
   font-weight: 700;
 }
@@ -236,17 +392,20 @@ select,
 textarea {
   display: block;
   width: 100%;
-  min-height: 52px;
-  padding: 0.5rem 0.75rem;
+  min-height: 56px;
+  padding: 0.5rem 0.85rem;
   border: 2px solid var(--borde);
-  border-radius: 8px;
-  background: var(--fondo);
-  color: var(--texto);
+  border-radius: 10px;
+  background: var(--hoja);
+  color: var(--tinta);
   font: inherit;
-  font-size: 1.1rem;
+  font-size: var(--t-boton);
 }
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible { border-color: var(--tinta); }
 
-textarea { min-height: 5.5rem; resize: vertical; }
+textarea { min-height: 6rem; font-size: var(--t-cuerpo); resize: vertical; }
 
 /* Opciones de una sola elección como botones grandes (radios accesibles). */
 .opciones { display: grid; gap: 0.5rem; }
@@ -264,101 +423,289 @@ textarea { min-height: 5.5rem; resize: vertical; }
 .opcion span {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
   min-height: 56px;
   padding: 0.5rem 1rem;
   border: 2px solid var(--borde);
-  border-radius: 10px;
+  border-radius: var(--radio);
+  background: var(--hoja);
   font-weight: 700;
   cursor: pointer;
+  transition: background-color 120ms ease-out;
 }
+.opcion span:active { background: var(--pista); }
 
 .opcion span::before {
   content: "";
   flex: none;
-  width: 1.3rem;
-  height: 1.3rem;
-  margin-right: 0.7rem;
+  width: 1.4rem;
+  height: 1.4rem;
   border: 2px solid currentColor;
   border-radius: 50%;
 }
 
-/* Elegida: cambia el color y aparece una marca, para no depender solo del color. */
-.opcion input:checked + span { background: var(--primario); border-color: var(--primario); color: #ffffff; }
+/* Elegida: se rellena en tinta y aparece la palomita, para no depender solo del color. */
+.opcion input:checked + span { background: var(--tinta); border-color: var(--tinta); color: var(--papel); }
 .opcion input:checked + span::before {
-  content: "✓";
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-  color: var(--primario);
-  font-size: 0.95rem;
+  border-color: var(--papel);
+  background: var(--papel) var(--i-palomita) center / 75% no-repeat;
 }
-.opcion input:focus-visible + span { outline: 3px solid var(--enfoque); outline-offset: 2px; }
+.opcion input:focus-visible + span { outline: 3px solid var(--tinta); outline-offset: 3px; }
 
-/* Error: borde más grueso y texto junto al campo, nunca solo color. */
+.opciones-grandes .opcion span { min-height: 64px; font-size: var(--t-boton); }
+
+/* Error: borde más grueso, ícono y texto junto al campo; nunca solo color. */
 .con-error input,
 .con-error select,
 .con-error textarea,
 .con-error .opcion span { border-color: var(--error); border-width: 3px; }
 
 .error {
-  margin: 0.4rem 0 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: 0.45rem 0 0;
   color: var(--error);
   font-weight: 700;
 }
-.error::before { content: "⚠ "; }
-
-.contador { margin: 0.25rem 0 0; color: var(--texto-suave); font-size: 0.9rem; }
-
-/* ---------- Detalle ---------- */
-
-.datos-lote { margin: 0.25rem 0; color: var(--texto-suave); }
-
-.desglose {
-  width: 100%;
-  margin: 1rem 0;
-  border-collapse: collapse;
+.error::before {
+  content: "";
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+  margin-top: 0.1em;
+  background: currentColor;
+  -webkit-mask: var(--i-alerta) center / contain no-repeat;
+  mask: var(--i-alerta) center / contain no-repeat;
 }
-.desglose caption { margin-bottom: 0.4rem; font-weight: 700; text-align: left; }
-.desglose th,
-.desglose td {
-  padding: 0.45rem 0.25rem;
-  border-bottom: 1px solid #bbbbbb;
-  text-align: left;
-  vertical-align: top;
+
+.contador { margin: 0.3rem 0 0; color: var(--tinta-suave); font-size: var(--t-meta); }
+
+/* ---------- Vista 3. Detalle y motivo ---------- */
+
+.datos-lote { margin: 0 0 1rem; color: var(--tinta-suave); }
+
+/* El nivel y el primer aviso forman un solo bloque: el aviso es la lectura del nivel. */
+.bloque-nivel {
+  overflow: hidden;
+  margin: 0 0 1.25rem;
+  border: 2px solid var(--tinta);
+  border-radius: var(--radio);
+  background: var(--hoja);
 }
-.desglose .numero {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  font-weight: 700;
+.bloque-nivel .franja { padding: 0.75rem 1rem; }
+.nivel-titulo { display: flex; flex-direction: column; line-height: 1.1; }
+.nivel-titulo small { font-size: var(--t-cuerpo); font-weight: 600; }
+.nivel-titulo strong { display: inline-flex; align-items: center; gap: 0.5rem; font-size: var(--t-nivel); }
+.nivel-titulo .marca { font-size: var(--t-cuerpo); }
+.bloque-puntaje { display: flex; flex-direction: column; align-items: flex-end; line-height: 1; }
+.bloque-puntaje strong { font-size: var(--t-puntaje); }
+.bloque-puntaje small { margin-top: 0.2rem; font-size: var(--t-meta); font-weight: 600; }
+.bloque-nivel .aviso-nivel { margin: 0; padding: 0.75rem 1rem 0.85rem; font-weight: 600; }
+
+/* Desglose en cascada: cada factor empieza donde terminó el anterior, como una suma hecha
+   a mano. La escala es fija (0 a 60) para que las líneas de 20 y 40 no cambien de lugar
+   entre lotes; lo que pasa de 60 se corta y se marca, y el total siempre va en número. */
+.desglose { margin: 0.25rem 0 1rem; }
+.desglose h2 { margin: 0 0 0.75rem; }
+
+.escala {
+  position: relative;
+  height: 1.5rem;
+  margin: 0 12px 0.25rem 0;
+  color: var(--tinta-suave);
+  font-size: var(--t-meta);
+  font-weight: 600;
+}
+.escala span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.escala span:first-child { transform: none; }
+.escala span:last-child { transform: translateX(-100%); }
+
+.cascada { margin: 0; padding: 0; list-style: none; }
+.factor { padding: 0.5rem 0 0.6rem; border-bottom: 2px solid var(--renglon); }
+.factor-cabeza { display: flex; justify-content: space-between; gap: 1rem; font-weight: 700; }
+.factor-explicacion { display: block; margin-top: 0.3rem; color: var(--tinta-suave); }
+
+/* Todas las pistas y la escala dejan 12 px a la derecha para la punta de desbordamiento:
+   así las líneas de 20 y 40 quedan alineadas aunque solo un renglón se desborde. */
+.pista {
+  display: block;
+  position: relative;
+  height: 20px;
+  margin: 0.4rem 12px 0 0;
+  border-radius: 4px;
+  background: var(--pista);
+}
+/* Líneas de umbral: atraviesan todas las pistas en el mismo lugar. Van debajo de las barras
+   y sobresalen arriba y abajo, así la barra se lee entera y se ve qué umbral cruzó. */
+.pista::before,
+.pista::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: -6px;
+  bottom: -6px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--tinta-suave);
+}
+.pista::before { left: var(--umbral-media); }
+.pista::after { left: var(--umbral-alta); }
+
+.barra {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  left: var(--inicio);
+  width: var(--ancho);
+  border-radius: 3px;
+  background: var(--tinta);
+}
+/* Se pasó de 60: la barra llega al borde y termina en punta. */
+.desborda .barra { border-radius: 3px 0 0 3px; }
+.desborda .pista { border-radius: 4px 0 0 4px; }
+.desborda .barra::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: 100%;
+  width: 12px;
+  background: inherit;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+/* El factor que más pesa se dice con texto, no solo con el largo de la barra. */
+.pesa-mas {
+  margin-left: 0.5rem;
+  padding: 0 0.4rem;
+  border: 2px solid var(--tinta);
+  border-radius: 6px;
+  font-size: var(--t-meta);
   white-space: nowrap;
 }
-.desglose .total th,
-.desglose .total td { border-top: 3px solid var(--texto); border-bottom: 0; font-size: 1.1rem; }
+.factor-mayor .numero-total { font-size: var(--t-boton); }
 
-.decision-actual { font-weight: 700; }
+/* El total va bajo una raya, como la suma en la libreta. */
+.factor-total { margin-top: -2px; padding-top: 0.75rem; border-top: 3px solid var(--tinta); border-bottom: 0; }
+.factor-total .factor-cabeza { align-items: center; font-size: var(--t-boton); }
+.factor-total .numero-total { margin-left: auto; font-size: 1.75rem; }
+.factor-total .factor-cabeza { gap: 0.75rem; }
+.factor-total .pista { height: 28px; }
+.total-alta .barra { background: var(--alta); }
+.total-media .barra { background: var(--media); box-shadow: inset 0 0 0 2px var(--tinta); }
+.total-baja .barra { background: var(--baja); }
 
-/* ---------- Historial ---------- */
-
-.lista-historial { margin: 0.75rem 0; padding: 0; list-style: none; }
-
-.lista-historial li {
-  padding: 0.6rem 0;
-  border-bottom: 1px solid #bbbbbb;
+.decision-actual {
+  margin: 1rem 0 0;
+  padding: 0.75rem 0.9rem;
+  border: 2px solid var(--renglon);
+  border-radius: var(--radio);
+  background: var(--hoja);
+  font-weight: 700;
 }
 
-.historial-fecha { display: block; color: var(--texto-suave); font-size: 0.9rem; }
-.historial-observacion { display: block; margin-top: 0.2rem; font-style: italic; }
+/* ---------- Vista 5. Historial ---------- */
+
+.lista-historial { margin: 0.5rem 0 0; padding: 0; list-style: none; }
+
+.historial-dia {
+  margin-top: 1.25rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid var(--tinta);
+  font-weight: 700;
+}
+.historial-dia::first-letter { text-transform: uppercase; }
+
+.historial-entrada {
+  display: grid;
+  grid-template-columns: 5.75rem 1fr;
+  gap: 0 0.5rem;
+  padding: 0.65rem 0;
+  border-bottom: 2px solid var(--renglon);
+  transition: background-color 1.2s ease-out;
+}
+.historial-hora { color: var(--tinta-suave); font-weight: 600; }
+.historial-texto { min-width: 0; }
+.historial-observacion { display: block; margin-top: 0.25rem; color: var(--tinta-suave); font-style: italic; }
+
+/* Confirmación de la decisión: aparece sobre la barra de abajo, sin taparla. */
+.confirmacion:empty { display: none; }
+.confirmacion {
+  position: fixed;
+  left: 50%;
+  bottom: var(--sobre-barra, 1rem);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: min(30rem, calc(100% - 2rem));
+  padding: 0.85rem 1rem;
+  border-radius: var(--radio);
+  background: var(--tinta);
+  color: var(--papel);
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgb(31 27 22 / 0.28);
+  transform: translateX(-50%);
+  animation: confirmacion-entra 220ms var(--curva);
+}
+.confirmacion .icono { width: 1.4em; height: 1.4em; }
+
+@keyframes confirmacion-entra {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+}
 
 /* ---------- Información ---------- */
 
-.ficha { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 0.75rem; margin: 0.75rem 0; }
+.ficha {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 0.9rem;
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border: 2px solid var(--renglon);
+  border-radius: var(--radio);
+  background: var(--hoja);
+}
 .ficha dt { font-weight: 700; }
 .ficha dd { margin: 0; overflow-wrap: anywhere; }
+#info-establecimiento { white-space: nowrap; }
+
+.lectura h2 { padding-top: 1.25rem; border-top: 2px solid var(--renglon); }
+.lectura ul,
+.lectura ol { padding-left: 1.4rem; }
+.lectura li { margin: 0.35rem 0; }
+.lectura .boton { margin-bottom: 0.5rem; }
+.lectura > :last-child { margin-bottom: 2rem; }
 
 .confirmar {
   margin: 0.75rem 0;
   padding: 0.75rem;
   border: 3px solid var(--error);
-  border-radius: 10px;
+  border-radius: var(--radio);
+  background: var(--error-fondo);
+}
+
+/* ---------- Transición entre vistas ---------- */
+
+/* Más adentro (lista → detalle → decisión) entra por la derecha; de regreso, por la
+   izquierda. Dura 160 ms y no retiene ningún toque: la vista nueva ya está lista. */
+::view-transition-old(root) { animation: 120ms ease-out both vista-sale; }
+::view-transition-new(root) { animation: 160ms var(--curva) both vista-entra; }
+:root[data-sentido="atras"]::view-transition-new(root) { animation-name: vista-regresa; }
+
+@keyframes vista-sale { to { opacity: 0; } }
+@keyframes vista-entra { from { opacity: 0; transform: translateX(28px); } }
+@keyframes vista-regresa { from { opacity: 0; transform: translateX(-28px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after,
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+    transition: none !important;
+  }
 }

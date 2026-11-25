@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#00473e">
+  <meta name="theme-color" content="#f5efe3">
   <title>Prioridades de revisión</title>
   <link rel="manifest" href="manifest.json">
   <!-- El ícono va incrustado: Chromium vuelve a pedir un favicon externo en cada cambio de
@@ -28,25 +28,36 @@
       <h1 id="titulo-lista" tabindex="-1">Prioridades de revisión</h1>
       <p class="aviso aviso-demo" id="lista-aviso-demo" data-texto="aviso_demo" hidden></p>
 
-      <ol id="lista-lotes" class="lista-lotes"></ol>
+      <section id="lista-primero" aria-labelledby="titulo-primero" hidden>
+        <h2 id="titulo-primero">Revisa primero</h2>
+        <div id="tarjeta-primero"></div>
+      </section>
+
+      <section id="lista-resto" aria-labelledby="titulo-resto" hidden>
+        <h2 id="titulo-resto">Después</h2>
+        <ol id="lista-lotes" class="renglones"></ol>
+      </section>
 
       <div id="lista-vacia" class="vacio" hidden>
-        <p>Todavía no hay lotes registrados.</p>
+        <h2>Aún no hay lotes</h2>
+        <p>Registra el primer lote que te llegó hoy. Son seis datos: producto, kilos, fecha, cómo
+           llegó, el clima y, si quieres, el costo.</p>
+        <p class="aviso aviso-demo" data-texto="aviso_demo"></p>
         <button type="button" class="boton secundario" data-accion="cargar-demo">Cargar datos de demostración</button>
         <p class="mensaje" role="status" data-mensaje-demo></p>
       </div>
 
       <nav class="barra-inferior" aria-label="Acciones">
+        <a href="#registro" class="boton primario"><span class="icono icono-mas" aria-hidden="true"></span>Registrar lote</a>
         <a href="#historial" class="boton secundario">Historial</a>
         <a href="#informacion" class="boton secundario">Información</a>
-        <a href="#registro" class="boton primario">Registrar lote</a>
       </nav>
     </section>
 
     <!-- Vista 2. Registro de lote -->
     <section id="vista-registro" class="vista" aria-labelledby="titulo-registro" hidden>
       <div class="encabezado">
-        <a href="#lista" class="volver">← Volver</a>
+        <a href="#lista" class="volver"><span class="icono icono-volver" aria-hidden="true"></span>Prioridades</a>
         <h1 id="titulo-registro" tabindex="-1">Registrar lote</h1>
       </div>
 
@@ -94,21 +105,23 @@
           <p class="error" id="error-costo" hidden></p>
         </div>
 
-        <button type="submit" class="boton primario">Guardar lote</button>
+        <div class="barra-inferior">
+          <button type="submit" class="boton primario">Guardar lote</button>
+        </div>
       </form>
     </section>
 
     <!-- Vista 3. Detalle y motivo -->
     <section id="vista-detalle" class="vista" aria-labelledby="detalle-producto" hidden>
       <div class="encabezado">
-        <a href="#lista" class="volver">← Volver</a>
+        <a href="#lista" class="volver"><span class="icono icono-volver" aria-hidden="true"></span>Prioridades</a>
         <h1 id="detalle-producto" tabindex="-1"></h1>
       </div>
       <p id="detalle-datos" class="datos-lote"></p>
-      <p id="detalle-nivel" class="nivel nivel-grande"></p>
-
-      <p class="aviso" data-texto="aviso_prioridad"></p>
-      <p class="aviso" data-texto="aviso_decision"></p>
+      <div class="bloque-nivel">
+        <div id="detalle-nivel" class="nivel franja"></div>
+        <p class="aviso-nivel" data-texto="aviso_prioridad"></p>
+      </div>
 
       <form id="form-fecha" novalidate hidden>
         <div class="campo" data-campo="fecha-detalle">
@@ -121,21 +134,24 @@
 
       <p id="detalle-generico" class="nota" hidden></p>
 
-      <table id="detalle-desglose" class="desglose" hidden>
-        <caption>Por qué tiene esta prioridad</caption>
-        <tbody></tbody>
-      </table>
+      <section id="detalle-desglose" class="desglose" aria-labelledby="titulo-desglose" hidden>
+        <h2 id="titulo-desglose">Por qué tiene esta prioridad</h2>
+        <div class="escala" aria-hidden="true"></div>
+        <ol class="cascada"></ol>
+      </section>
 
       <p id="detalle-decision-actual" class="decision-actual" hidden></p>
-      <div id="detalle-acciones" class="barra-inferior" hidden>
-        <a id="detalle-boton-decision" class="boton primario">Registrar decisión</a>
+      <!-- El segundo aviso va anclado junto al botón: nadie decide sin haberlo visto. -->
+      <div class="barra-inferior">
+        <p class="aviso-anclado" data-texto="aviso_decision"></p>
+        <a id="detalle-boton-decision" class="boton primario" hidden>Registrar decisión</a>
       </div>
     </section>
 
     <!-- Vista 4. Decisión -->
     <section id="vista-decision" class="vista" aria-labelledby="titulo-decision" hidden>
       <div class="encabezado">
-        <a id="decision-volver" class="volver">← Volver</a>
+        <a id="decision-volver" class="volver"><span class="icono icono-volver" aria-hidden="true"></span>Detalle</a>
         <h1 id="titulo-decision" tabindex="-1">Registrar decisión</h1>
       </div>
       <p id="decision-lote" class="datos-lote"></p>
@@ -143,7 +159,7 @@
       <form id="form-decision" novalidate>
         <fieldset class="campo" data-campo="decision" aria-describedby="error-decision">
           <legend>¿Qué decides para este lote?</legend>
-          <div class="opciones" id="opciones-decision"></div>
+          <div class="opciones opciones-grandes" id="opciones-decision"></div>
           <p class="error" id="error-decision" hidden></p>
         </fieldset>
 
@@ -153,28 +169,33 @@
           <p class="contador" id="contador-observacion"></p>
         </div>
 
-        <button type="submit" class="boton primario">Guardar decisión</button>
+        <div class="barra-inferior">
+          <button type="submit" class="boton primario">Guardar decisión</button>
+        </div>
       </form>
     </section>
 
     <!-- Vista 5. Historial -->
     <section id="vista-historial" class="vista" aria-labelledby="titulo-historial" hidden>
       <div class="encabezado">
-        <a href="#lista" class="volver">← Volver</a>
+        <a href="#lista" class="volver"><span class="icono icono-volver" aria-hidden="true"></span>Prioridades</a>
         <h1 id="titulo-historial" tabindex="-1">Historial</h1>
       </div>
-      <p class="aviso" data-texto="aviso_privacidad"></p>
-      <button type="button" class="boton primario" id="boton-exportar">Exportar a CSV</button>
-      <p class="mensaje" role="status" id="mensaje-exportar"></p>
-
       <ol id="lista-historial" class="lista-historial"></ol>
       <p id="historial-vacio" class="vacio" hidden>Todavía no hay registros.</p>
+
+      <div class="barra-inferior" id="barra-historial">
+        <p class="aviso-anclado" data-texto="aviso_privacidad"></p>
+        <p class="mensaje" role="status" id="mensaje-exportar"></p>
+        <button type="button" class="boton primario" id="boton-exportar">Exportar a CSV</button>
+      </div>
+      <p id="confirmacion-decision" class="confirmacion" role="status"></p>
     </section>
 
     <!-- Pantalla de información -->
-    <section id="vista-informacion" class="vista" aria-labelledby="titulo-informacion" hidden>
+    <section id="vista-informacion" class="vista lectura" aria-labelledby="titulo-informacion" hidden>
       <div class="encabezado">
-        <a href="#lista" class="volver">← Volver</a>
+        <a href="#lista" class="volver"><span class="icono icono-volver" aria-hidden="true"></span>Prioridades</a>
         <h1 id="titulo-informacion" tabindex="-1">Información</h1>
       </div>
 
