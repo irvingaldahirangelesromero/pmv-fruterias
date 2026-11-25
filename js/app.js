@@ -44,7 +44,10 @@ function formatoFecha(fechaISO) {
 const formatoFechaHora = (fechaHoraISO) =>
   new Date(fechaHoraISO).toLocaleString("es-MX", { dateStyle: "short", timeStyle: "short" });
 
-const etiquetaDemo = () => crear("span", "etiqueta-demo", "DEMO");
+// Etiqueta visible DEMO, separada por un espacio para que también se lea aparte.
+function agregarEtiquetaDemo(elemento, lote) {
+  if (lote.origen === "DEMO") elemento.append(" ", crear("span", "etiqueta-demo", "DEMO"));
+}
 
 // ER-04: si el navegador bloquea el almacenamiento, el aviso queda fijo y la app sigue en
 // memoria. No se vuelve a intentar escribir: el aviso no debe aparecer y desaparecer.
@@ -93,6 +96,9 @@ async function arrancar() {
   window.addEventListener("hashchange", mostrarVista);
   $("app").hidden = false;
   mostrarVista(); // la lista guarda su evento: así se prueba la escritura desde el inicio
+
+  // Guarda la app en el teléfono para que funcione sin conexión (sw.js).
+  navigator.serviceWorker?.register("sw.js").catch((error) => console.error("Sin modo sin conexión:", error));
 }
 
 // ---------- Navegación ----------
@@ -138,7 +144,7 @@ function filaDeLote({ lote, resultado }) {
   if (lote.id_lote === idResaltado) enlace.classList.add("resaltado");
 
   const producto = crear("span", "fila-producto", `${lote.producto} · ${formatoKg(lote.cantidad_kg)}`);
-  if (lote.origen === "DEMO") producto.append(etiquetaDemo());
+  agregarEtiquetaDemo(producto, lote);
 
   const cabeza = crear("span", "fila-cabeza");
   cabeza.append(producto, crear("span", `nivel ${claseNivel(resultado.nivel)}`, textoNivel(resultado)));
@@ -329,7 +335,7 @@ function pintarDetalle(lote) {
   const datos = $("detalle-datos");
   datos.textContent = `${lote.id_lote} · ${formatoKg(lote.cantidad_kg)} · ` +
     (lote.fecha_ingreso ? `ingresó el ${formatoFecha(lote.fecha_ingreso)}` : "sin fecha de ingreso");
-  if (lote.origen === "DEMO") datos.append(etiquetaDemo());
+  agregarEtiquetaDemo(datos, lote);
 
   const nivel = $("detalle-nivel");
   nivel.className = `nivel nivel-grande ${claseNivel(resultado.nivel)}`;
@@ -404,7 +410,7 @@ function mostrarDecision(lote) {
   actualizarContador();
 
   $("decision-lote").textContent = `${lote.id_lote} · ${lote.producto} · ${formatoKg(lote.cantidad_kg)}`;
-  if (lote.origen === "DEMO") $("decision-lote").append(etiquetaDemo());
+  agregarEtiquetaDemo($("decision-lote"), lote);
   $("decision-volver").href = `#detalle/${lote.id_lote}`;
   return $("vista-decision");
 }
@@ -433,7 +439,7 @@ function entradaDeHistorial(evento) {
   item.append(evento.evento === "lote_registrado"
     ? `Lote registrado: ${lote.id_lote} · ${lote.producto} · ${formatoKg(lote.cantidad_kg)}`
     : `Decisión: ${evento.decision} · ${lote.id_lote} · ${lote.producto}`);
-  if (lote.origen === "DEMO") item.append(etiquetaDemo());
+  agregarEtiquetaDemo(item, lote);
   // La observación pertenece a la decisión vigente del lote.
   if (evento.fecha_hora === lote.fecha_decision && lote.observacion) {
     item.append(crear("span", "historial-observacion", `“${lote.observacion}”`));

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Lista priorizada: tres renglones con el color de su nivel. Fondo completo para íconos adaptables. -->
+  <rect width="512" height="512" fill="#00473e"/>
+  <g fill="#ffffff">
+    <rect x="196" y="140" width="196" height="44" rx="22"/>
+    <rect x="196" y="234" width="156" height="44" rx="22"/>
+    <rect x="196" y="328" width="116" height="44" rx="22"/>
+  </g>
+  <circle cx="146" cy="162" r="30" fill="#e53935" stroke="#ffffff" stroke-width="8"/>
+  <circle cx="146" cy="256" r="30" fill="#f2a900" stroke="#ffffff" stroke-width="8"/>
+  <circle cx="146" cy="350" r="30" fill="#43a047" stroke="#ffffff" stroke-width="8"/>
+</svg>
