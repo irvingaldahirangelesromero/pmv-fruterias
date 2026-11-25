@@ -34,6 +34,7 @@
     import {
       estadoVacio, agregarLote, guardarDecision, prepararDemo, siguienteIdLote, fechaHoraLocal,
     } from "./js/almacen.js";
+    import { generarCSV, nombreArchivo, COLUMNAS } from "./js/exportar.js";
 
     // Fecha fija para que las pruebas no dependan del día en que se corren.
     const HOY = new Date(2026, 10, 25); // 25 de noviembre de 2026
@@ -142,6 +143,30 @@
         () => fechaHoraLocal(new Date(2026, 2, 5, 9, 7, 3)).slice(0, 19));
     }
 
+    function pruebasDeExportacion(config, demo) {
+      const estado = estadoVacio(config);
+      for (const datos of prepararDemo(demo, HOY)) agregarLote(estado, datos, config, HOY);
+      guardarDecision(estado, estado.lotes[0], "Separar", 'Dijo "mañana", revisar, por favor\nsegunda línea', config, HOY);
+      agregarLote(estado, { ...lote("Chile", null, "Normal", "Normal"), cantidad_kg: 3, origen: "REAL" }, config, HOY);
+      const csv = generarCSV(estado, config, HOY);
+      const renglones = csv.slice(1).trimEnd().split("\r\n");
+
+      probar("RC-04 empieza con BOM UTF-8", "FEFF", () => csv.charCodeAt(0).toString(16).toUpperCase());
+      probar("RC-04 encabezado con las 16 columnas en orden",
+        "establecimiento,version_app,id_lote,producto,cantidad_kg,fecha_ingreso,dias_desde_ingreso,condicion_recepcion,condicion_ambiental,costo_aproximado,puntaje,nivel,decision,observacion,fecha_decision,origen",
+        () => renglones[0]);
+      probar("RC-04 son 16 columnas", 16, () => COLUMNAS.length);
+      probar("CSV: lote DEMO sin decisión", "SIN-ASIGNAR,0.1,L-002,Chile,10,2026-11-23,2,Con humedad o golpe,Normal,300,30.0,Media,,,,DEMO",
+        () => renglones[2]);
+      probar("CSV: observación con comillas, coma y salto de línea va entre comillas", true,
+        () => csv.includes(',Separar,"Dijo ""mañana"", revisar, por favor\nsegunda línea",'));
+      probar("CSV: lote sin fecha sale como Prioridad por confirmar, sin días ni puntaje",
+        "SIN-ASIGNAR,0.1,L-006,Chile,3,,,Normal,Normal,,,Prioridad por confirmar,,,,REAL",
+        () => renglones.at(-1));
+      probar("CSV: incluye todos los lotes, DEMO y reales", 6, () => csv.split("\r\nSIN-ASIGNAR,").length - 1);
+      probar("Nombre del archivo", "pmv_SIN-ASIGNAR_2026-11-25.csv", () => nombreArchivo(config, HOY));
+    }
+
     function mostrar() {
       let fallidas = 0;
       for (const { caso, esperado, obtenido } of resultados) {
@@ -165,6 +190,7 @@
       const demo = await (await fetch("./datos/demo.json")).json();
       pruebasDePrioridad(config);
       pruebasDeAlmacen(config, demo);
+      pruebasDeExportacion(config, demo);
       mostrar();
     } catch (error) {
       document.getElementById("resumen").textContent = `No se pudieron correr las pruebas: ${error.message}`;

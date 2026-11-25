@@ -13,6 +13,8 @@
     No se pudo abrir la aplicación. Revisa tu conexión y vuelve a abrirla.
   </p>
 
+  <p id="aviso-almacen" class="aviso-error aviso-fijo" role="alert" data-texto="aviso_almacenamiento" hidden></p>
+
   <main id="app" hidden>
 
     <!-- Vista 1. Prioridades de revisión (inicio) -->
@@ -61,7 +63,9 @@
 
         <div class="campo" data-campo="fecha">
           <label for="fecha">Fecha de ingreso</label>
-          <input id="fecha" name="fecha" type="date" aria-describedby="error-fecha">
+          <input id="fecha" name="fecha" type="date" aria-describedby="error-fecha nota-fecha">
+          <p class="nota" id="nota-fecha" hidden>Sin fecha de ingreso, el lote quedará como
+             «Prioridad por confirmar» hasta que la escribas.</p>
           <p class="error" id="error-fecha" hidden></p>
         </div>
 
@@ -99,6 +103,15 @@
 
       <p class="aviso" data-texto="aviso_prioridad"></p>
       <p class="aviso" data-texto="aviso_decision"></p>
+
+      <form id="form-fecha" novalidate hidden>
+        <div class="campo" data-campo="fecha-detalle">
+          <label for="fecha-detalle">Falta la fecha de ingreso. Escríbela para calcular la prioridad.</label>
+          <input id="fecha-detalle" name="fecha" type="date" aria-describedby="error-fecha-detalle">
+          <p class="error" id="error-fecha-detalle" hidden></p>
+        </div>
+        <button type="submit" class="boton primario">Guardar fecha</button>
+      </form>
 
       <p id="detalle-generico" class="nota" hidden></p>
 
@@ -145,6 +158,8 @@
         <h1 id="titulo-historial" tabindex="-1">Historial</h1>
       </div>
       <p class="aviso" data-texto="aviso_privacidad"></p>
+      <button type="button" class="boton primario" id="boton-exportar">Exportar a CSV</button>
+      <p class="mensaje" role="status" id="mensaje-exportar"></p>
 
       <ol id="lista-historial" class="lista-historial"></ol>
       <p id="historial-vacio" class="vacio" hidden>Todavía no hay registros.</p>

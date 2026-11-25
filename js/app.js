@@ -6,6 +6,7 @@ import {
   calcularPrioridad, motivoCorto, avisoProductoGenerico, rellenarTexto, POR_CONFIRMAR,
 } from "./prioridad.js";
 import * as almacen from "./almacen.js";
+import { generarCSV, nombreArchivo, descargarArchivo } from "./exportar.js";
 
 // Código que trae config.json mientras el equipo no asigna el del establecimiento.
 const SIN_CODIGO = "SIN-ASIGNAR";
@@ -15,6 +16,7 @@ let demo; // datos/demo.json
 let estado; // { version, establecimiento, lotes, eventos }
 let idResaltado = null; // lote recién guardado, se resalta un instante en la lista
 let loteEnDecision = null;
+let almacenDisponible = true; // pasa a false en cuanto falla una lectura o escritura (ER-04)
 
 const $ = (id) => document.getElementById(id);
 
@@ -44,8 +46,15 @@ const formatoFechaHora = (fechaHoraISO) =>
 
 const etiquetaDemo = () => crear("span", "etiqueta-demo", "DEMO");
 
+// ER-04: si el navegador bloquea el almacenamiento, el aviso queda fijo y la app sigue en
+// memoria. No se vuelve a intentar escribir: el aviso no debe aparecer y desaparecer.
+function marcarFallaDeAlmacen() {
+  almacenDisponible = false;
+  $("aviso-almacen").hidden = false;
+}
+
 function persistir() {
-  almacen.escribir(estado);
+  if (!almacenDisponible || !almacen.escribir(estado)) marcarFallaDeAlmacen();
 }
 
 // ---------- Arranque ----------
@@ -66,20 +75,24 @@ async function arrancar() {
     return;
   }
 
-  estado = almacen.leer(config).estado;
+  const lectura = almacen.leer(config);
+  estado = lectura.estado;
   // Manda config.json: si el equipo asigna el código en el alta, los eventos nuevos lo usan.
   estado.establecimiento = config.establecimiento;
+  almacenDisponible = lectura.ok;
 
   for (const elemento of document.querySelectorAll("[data-texto]")) {
     elemento.textContent = config.textos[elemento.dataset.texto];
   }
   prepararRegistro();
+  prepararDetalle();
   prepararDecision();
+  prepararHistorial();
   prepararInformacion();
 
   window.addEventListener("hashchange", mostrarVista);
   $("app").hidden = false;
-  mostrarVista();
+  mostrarVista(); // la lista guarda su evento: así se prueba la escritura desde el inicio
 }
 
 // ---------- Navegación ----------
@@ -205,8 +218,15 @@ function prepararRegistro() {
     $("nota-producto").textContent = avisoProductoGenerico(config);
   });
 
+  $("fecha").addEventListener("input", actualizarNotaFecha);
+  $("fecha").addEventListener("change", actualizarNotaFecha);
   $("form-lote").addEventListener("submit", guardarLote);
   reiniciarRegistro();
+}
+
+function actualizarNotaFecha() {
+  const fecha = $("fecha");
+  $("nota-fecha").hidden = fecha.value !== "" || fecha.validity.badInput;
 }
 
 function reiniciarRegistro() {
@@ -214,12 +234,22 @@ function reiniciarRegistro() {
   formulario.reset();
   $("fecha").value = almacen.fechaLocal(new Date()); // se preselecciona hoy
   $("nota-producto").hidden = true;
+  actualizarNotaFecha();
   mostrarErrores(formulario, {});
 }
 
 function mostrarRegistro() {
   $("fecha").max = almacen.fechaLocal(new Date());
   return $("vista-registro");
+}
+
+// Mensaje de error de un campo de fecha, o undefined si está bien.
+function errorDeFecha(entrada, obligatoria) {
+  if (entrada.validity.badInput) return "Escribe la fecha completa.";
+  if (entrada.value === "") return obligatoria ? "Escribe la fecha de ingreso." : undefined;
+  // Las fechas "AAAA-MM-DD" se pueden comparar como texto.
+  if (entrada.value > almacen.fechaLocal(new Date())) return "La fecha no puede ser posterior a hoy.";
+  return undefined;
 }
 
 function validarLote(formulario) {
@@ -233,9 +263,9 @@ function validarLote(formulario) {
   else if (cantidad.value === "") errores.cantidad = "Escribe la cantidad en kilos.";
   else if (!(Number.isFinite(kilos) && kilos > 0)) errores.cantidad = "La cantidad debe ser mayor que cero.";
 
-  // Las fechas "AAAA-MM-DD" se pueden comparar como texto.
-  if (fecha.validity.badInput) errores.fecha = "Escribe la fecha completa.";
-  else if (fecha.value > almacen.fechaLocal(new Date())) errores.fecha = "La fecha no puede ser posterior a hoy.";
+  // ER-01: sin fecha sí se guarda, como "Prioridad por confirmar"; el detalle la pide después.
+  const mensajeFecha = errorDeFecha(fecha, false);
+  if (mensajeFecha) errores.fecha = mensajeFecha;
 
   if (!recepcion.value) errores.recepcion = "Elige la condición de recepción.";
   if (!ambiental.value) errores.ambiental = "Elige la condición ambiental.";
@@ -308,6 +338,13 @@ function pintarDetalle(lote) {
   $("detalle-generico").hidden = !resultado.vida_util_generica;
   $("detalle-generico").textContent = avisoProductoGenerico(config);
 
+  // ER-01: sin fecha no se calcula la antigüedad; se pide el dato aquí mismo.
+  const formularioFecha = $("form-fecha");
+  formularioFecha.hidden = Boolean(lote.fecha_ingreso);
+  formularioFecha.reset();
+  $("fecha-detalle").max = almacen.fechaLocal(new Date());
+  mostrarErrores(formularioFecha, {});
+
   const tabla = $("detalle-desglose");
   tabla.hidden = resultado.puntaje === null;
   if (resultado.puntaje !== null) tabla.tBodies[0].replaceChildren(...filasDesglose(lote, resultado));
@@ -321,6 +358,21 @@ function pintarDetalle(lote) {
   // Sin puntaje no hay prioridad sobre la cual decidir: primero se pide el dato que falta.
   $("detalle-boton-decision").href = `#decision/${lote.id_lote}`;
   $("detalle-acciones").hidden = resultado.puntaje === null;
+}
+
+function prepararDetalle() {
+  $("form-fecha").addEventListener("submit", (evento) => {
+    evento.preventDefault();
+    const entrada = $("fecha-detalle");
+    const mensaje = errorDeFecha(entrada, true);
+    mostrarErrores(evento.target, mensaje ? { "fecha-detalle": mensaje } : {});
+    if (mensaje) return;
+
+    const lote = estado.lotes.find((l) => l.id_lote === location.hash.split("/")[1]);
+    lote.fecha_ingreso = entrada.value;
+    persistir();
+    pintarDetalle(lote);
+  });
 }
 
 function mostrarDetalle(lote) {
@@ -389,7 +441,27 @@ function entradaDeHistorial(evento) {
   return item;
 }
 
+// ER-06: exportar no modifica nada; si se interrumpe, se puede repetir sin perder registros.
+function exportar() {
+  const mensaje = $("mensaje-exportar");
+  try {
+    const ahora = new Date();
+    const nombre = nombreArchivo(config, ahora);
+    descargarArchivo(generarCSV(estado, config, ahora), nombre);
+    mensaje.textContent = `Se generó el archivo ${nombre}. Si no aparece en tus descargas, ` +
+      "vuelve a exportar: tu historial sigue intacto.";
+  } catch (error) {
+    console.error(error);
+    mensaje.textContent = "No se pudo exportar. Tu historial sigue intacto; vuelve a intentarlo.";
+  }
+}
+
+function prepararHistorial() {
+  $("boton-exportar").addEventListener("click", exportar);
+}
+
 function mostrarHistorial() {
+  $("mensaje-exportar").textContent = "";
   // Los eventos se guardan en orden; al revés quedan del más reciente al más antiguo.
   const entradas = estado.eventos
     .filter((e) => e.evento === "lote_registrado" || e.evento === "decision_guardada")
@@ -421,7 +493,7 @@ function cerrarConfirmacion() {
 }
 
 function borrarTodo() {
-  almacen.borrar();
+  if (!almacen.borrar()) marcarFallaDeAlmacen();
   estado = almacen.estadoVacio(config);
   cerrarConfirmacion();
   $("mensaje-borrar").textContent = "Se borraron todos los datos de este dispositivo.";
