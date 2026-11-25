@@ -3,7 +3,7 @@
 //
 // IMPORTANTE: al publicar cualquier cambio (incluido datos/config.json), cambia CACHE.
 // Si no cambia, los teléfonos siguen usando los archivos viejos que ya guardaron.
-const CACHE = "pmv-fruterias-0.1-2026-11-25";
+const CACHE = "pmv-fruterias-0.1-publicacion-2026-11-25";
 
 const ARCHIVOS = [
   "./",

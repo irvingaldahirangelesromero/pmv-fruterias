@@ -1,0 +1,10 @@
+# Se publica solo la app. Todo lo demás de la raíz (pruebas.html y archivos de trabajo) queda fuera.
+/*
+!vercel.json
+!index.html
+!manifest.json
+!sw.js
+!css
+!js
+!datos
+!iconos
