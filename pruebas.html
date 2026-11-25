@@ -16,7 +16,7 @@
 <body>
   <!-- Página de prueba. No forma parte del recorrido de la app ni se enlaza desde ella. -->
   <h1>Pruebas del PMV</h1>
-  <p>Casos de docs/07-criterios.md que se pueden comprobar sin interfaz.
+  <p>Casos de verificación de la regla de prioridad, del almacenamiento y de la exportación a CSV.
      Ábrela desde un servidor local: <code>python3 -m http.server</code> y
      <code>http://localhost:8000/pruebas.html</code>.</p>
   <p id="resumen">Corriendo…</p>
@@ -113,7 +113,7 @@
 
     // No toca localStorage: comparte origen con la app y borraría datos reales.
     function pruebasDeAlmacen(config, demo) {
-      // Con la fecha real de hoy: los lotes DEMO deben coincidir siempre con docs/04-reglas.md.
+      // Con la fecha real de hoy: los lotes DEMO deben dar siempre 46.4, 30.0, 6.7, 41.7 y 12.5.
       const hoyReal = new Date();
       const estado = estadoVacio(config);
       for (const datos of prepararDemo(demo, hoyReal)) agregarLote(estado, datos, config, hoyReal);

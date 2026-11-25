@@ -1,6 +1,7 @@
-// Regla de prioridad (docs/04-reglas.md).
-// Funciones puras: reciben datos y devuelven valores. No tocan el DOM ni localStorage.
-// Todos los parámetros vienen de datos/config.json; aquí no hay números de la regla.
+// Regla de prioridad: P = 50 × (días desde el ingreso ÷ vida útil de referencia del producto)
+// + ajuste de recepción + ajuste ambiental. Alta si P ≥ 40, Media si 20 ≤ P < 40, Baja si P < 20.
+// Esos números son los valores actuales de datos/config.json: el código no los tiene escritos,
+// los lee de ahí. Funciones puras: reciben datos y devuelven valores, sin tocar el DOM ni localStorage.
 
 export const POR_CONFIRMAR = "Prioridad por confirmar";
 

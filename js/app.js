@@ -1,4 +1,5 @@
-// Arranque de la app y navegación entre las vistas de docs/03-recorrido.md.
+// Arranque de la app y navegación entre sus vistas: prioridades de revisión, registro de lote,
+// detalle y motivo, decisión, historial e información.
 // La navegación usa el fragmento de la dirección (#lista, #detalle/L-001…): no recarga la
 // página y el botón "atrás" del teléfono regresa a la vista anterior.
 

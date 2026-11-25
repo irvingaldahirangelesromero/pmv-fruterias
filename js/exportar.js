@@ -1,4 +1,5 @@
-// Exportación del historial a CSV (docs/05-datos.md). Se genera en el navegador, sin red.
+// Exportación del historial a CSV: un renglón por lote, 16 columnas, UTF-8 con BOM.
+// Se genera en el navegador, sin red.
 
 import { calcularPrioridad } from "./prioridad.js";
 import { fechaLocal } from "./almacen.js";

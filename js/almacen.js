@@ -1,4 +1,5 @@
-// Lectura y escritura en localStorage, y registro de eventos (docs/05-datos.md).
+// Lectura y escritura en localStorage bajo una sola clave, y registro de los cuatro eventos de uso:
+// lote_registrado, prioridad_consultada, detalle_abierto y decision_guardada.
 // Todo acceso a localStorage va en try/catch: el navegador puede bloquearlo (modo privado).
 // Si falla, la app sigue funcionando en memoria y muestra el aviso de ER-04.
 
@@ -69,7 +70,8 @@ export function borrar() {
   }
 }
 
-// Agrega uno de los cuatro eventos de docs/05-datos.md. Devuelve su fecha y hora.
+// Agrega un evento de uso con la versión de la app, el establecimiento, la fecha y la hora.
+// Devuelve su fecha y hora.
 export function registrarEvento(estado, evento, extra, config, ahora) {
   const fecha_hora = fechaHoraLocal(ahora);
   estado.eventos.push({
@@ -120,7 +122,7 @@ export function guardarDecision(estado, lote, decision, observacion, config, aho
 
 // Convierte los lotes de datos/demo.json en datos de captura con fecha real:
 // la fecha de ingreso se calcula hacia atrás desde hoy, así los puntajes coinciden
-// siempre con la tabla de docs/04-reglas.md.
+// siempre con los casos de verificación de la regla (46.4, 30.0, 6.7, 41.7 y 12.5).
 export function prepararDemo(demo, hoy) {
   return demo.lotes.map(({ dias_desde_ingreso, ...datos }) => {
     const ingreso = new Date(hoy);

@@ -1,5 +1,5 @@
 {
-  "descripcion": "Cinco lotes ficticios de docs/04-reglas.md. La fecha de ingreso se calcula al cargarlos: hoy menos dias_desde_ingreso.",
+  "descripcion": "Cinco lotes ficticios para demostrar y verificar la regla. La fecha de ingreso se calcula al cargarlos (hoy menos dias_desde_ingreso), así sus puntajes siempre son 46.4, 30.0, 6.7, 41.7 y 12.5.",
   "lotes": [
     {
       "origen": "DEMO",
