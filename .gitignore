@@ -1,0 +1,15 @@
+# Solo se versionan los archivos de la app y su página de pruebas.
+# Todo lo demás en la raíz queda fuera del repositorio aunque exista en el disco.
+# Para versionar un archivo o carpeta nueva de la raíz, agrega aquí una línea con "!".
+/*
+!/.gitignore
+!/.vercelignore
+!/vercel.json
+!/index.html
+!/manifest.json
+!/sw.js
+!/pruebas.html
+!/css/
+!/js/
+!/datos/
+!/iconos/
